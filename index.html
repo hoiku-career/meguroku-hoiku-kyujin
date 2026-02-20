@@ -1,1 +1,494 @@
-111
+import React, { useState, useEffect } from 'react';
+import { CheckCircle2, Search, ArrowRight, MapPin, Building, ChevronRight, ChevronLeft, Clock, Calendar, Heart, GraduationCap } from 'lucide-react';
+
+export default function App() {
+  const [step, setStep] = useState('form'); // 'form', 'loading', 'result', 'detail'
+  const [progress, setProgress] = useState(0);
+  const [selectedJob, setSelectedJob] = useState(null); // 詳細表示用の求人データ
+  const [selectedOptions, setSelectedOptions] = useState({
+    concerns: [],
+    employmentType: [],
+    philosophy: []
+  });
+
+  // チェックボックスの切り替え処理
+  const toggleOption = (category, value) => {
+    setSelectedOptions(prev => {
+      const current = prev[category];
+      if (current.includes(value)) {
+        return { ...prev, [category]: current.filter(item => item !== value) };
+      } else {
+        return { ...prev, [category]: [...current, value] };
+      }
+    });
+  };
+
+  // フォーム送信処理
+  const handleSubmit = () => {
+    setStep('loading');
+    setProgress(0);
+  };
+
+  // ローディング時のプログレスバーと画面遷移の制御
+  useEffect(() => {
+    if (step === 'loading') {
+      const duration = 5000; // 5秒
+      const interval = 50; // 50msごとに更新
+      const steps = duration / interval;
+      let currentStep = 0;
+
+      const timer = setInterval(() => {
+        currentStep++;
+        setProgress(Math.min((currentStep / steps) * 100, 100));
+        
+        if (currentStep >= steps) {
+          clearInterval(timer);
+          setStep('result');
+        }
+      }, interval);
+
+      return () => clearInterval(timer);
+    }
+  }, [step]);
+
+  // ▼▼ 求人データ（完全匿名化済み） ▼▼
+  const allJobs = [
+    // --- 【正社員】用の求人データ ---
+    {
+      id: 1,
+      targetType: '正社員（フルタイム）',
+      badge: "年間休日129日・高給与",
+      title: "【東京都目黒区】定員29名の小規模認可保育園 / 保育士（正社員）",
+      tags: ["高給与", "年間休日120日以上", "退職金あり"],
+      description: "月給28万円以上スタート！年間休日129日でプライベートも充実できる認可保育園でのご勤務です。定員29名の小規模な環境で、子どもたち一人ひとりとじっくり関わることができます。",
+      salary: "月給 288,300円 〜 340,600円",
+      location: "東京都目黒区",
+      icon: <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" />,
+      // 詳細ページ用の追加データ
+      details: {
+        access: "東急東横線沿線 駅徒歩4分",
+        capacity: "定員29名（0歳～5歳）",
+        bonus: "年2回（基本給の2.15ヶ月分）",
+        workHours: "07:15〜19:15の間でシフト制（実働8時間）",
+        holidays: "年間休日129日（年末年始休暇6日、リフレッシュ休暇3日、誕生日休暇1日を含む）\n有給休暇、慶弔休暇、産休育休など",
+        welfare: "社会保険完備、退職金制度あり、借上社宅制度（上限あり/規定あり）、給食あり（1食380円）",
+        points: "・月給28万円以上の高給与求人です。\n・屋上園庭があり、のびのびと遊べる環境です。\n・退職金制度や各種休暇が充実しており、長く働きやすい職場です。"
+      }
+    },
+    {
+      id: 2,
+      targetType: '正社員（フルタイム）',
+      badge: "福利厚生・研修充実",
+      title: "【東京都目黒区】定員50名の認可保育園 / 保育士（正社員）",
+      tags: ["残業少なめ", "完全週休2日", "借り上げ社宅"],
+      description: "借り上げ社宅制度（上限95,000円）や引越し初期費用補助など、上京・一人暮らしを全力サポート！残業も月平均7時間程度と少なく、ワークライフバランスを保って働けます。",
+      salary: "月給 285,700円 〜 322,200円",
+      location: "東京都目黒区",
+      icon: <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" />,
+      // 詳細ページ用の追加データ
+      details: {
+        access: "東急目黒線沿線 駅徒歩2分",
+        capacity: "定員50名（0歳～5歳）",
+        bonus: "年2回",
+        workHours: "07:15〜20:15の間でシフト制（実働8時間）※残業平均月7時間",
+        holidays: "年間休日125日（週休2日制）\n有給休暇（初年度10日）、特別休暇（夏季・冬季）、産休・育休制度",
+        welfare: "社会保険完備、引越し初期費用補助（上限20万円）、借上社宅制度（補助上限95,000円）、各種研修制度、海外研修制度",
+        points: "・借り上げ社宅制度利用時の初期費用は法人負担！(火災保険料と引っ越し代のみ自己負担)\n・年間休日125日とお休みたっぷりの環境です。\n・「本物」に触れて自然と学べる保育を実践しています。"
+      }
+    },
+    {
+      id: 3,
+      targetType: '正社員（フルタイム）',
+      badge: "賞与3.5ヶ月分",
+      title: "【東京都目黒区】定員60名の認可保育園 / 保育士（正社員）",
+      tags: ["賞与高め", "定着率90%以上", "福利厚生充実"],
+      description: "賞与は計3.5ヶ月分＋年度末一時金ありと好待遇！定着率90%以上を誇る、働きやすさにこだわった法人です。「考えさせるを、考える」をテーマに主体性を育む保育を行っています。",
+      salary: "月給 244,456円 〜 （経験加算あり）",
+      location: "東京都目黒区",
+      icon: <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" />,
+      // 詳細ページ用の追加データ
+      details: {
+        access: "東京メトロ日比谷線・東急東横線沿線 駅徒歩5分",
+        capacity: "定員60名（0歳～5歳）",
+        bonus: "年2回（計3.5ヶ月分）＋ 年度末一時金（200,000円〜）",
+        workHours: "07:15〜20:15の間でシフト制（実働8時間）",
+        holidays: "年間休日120日（日祝、年末年始等）\n有給休暇、リフレッシュ休暇、産前産後休業、育児休業",
+        welfare: "社会保険完備、法人住宅手当・宿舎借り上げ制度あり、カフェテリアプラン制度、退職金制度",
+        points: "・定着率90%以上！長くご勤務していただける環境が整っています。\n・賞与3.5ヶ月分に加え、処遇改善一時金の支給があり好待遇です。\n・オンオフを切り替えてしっかり休める社風です。"
+      }
+    },
+
+    // --- 【パート・アルバイト】用の求人データ（保育園のダミー） ---
+    {
+      id: 4,
+      targetType: 'パート・アルバイト',
+      badge: "週3日〜OK",
+      title: "【東京都目黒区】認可保育園での保育補助（パート）",
+      tags: ["扶養内OK", "シフト自由", "無資格応相談"],
+      description: "保育士さんのサポート業務（お掃除、おもちゃの片付け、食事の準備など）をお任せします。週3日、1日4時間から勤務可能なので、家庭との両立がしやすい環境です。",
+      salary: "時給 1,300円 〜 1,500円",
+      location: "東京都目黒区",
+      icon: <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" />,
+      details: {
+        access: "目黒区内の駅から徒歩圏内",
+        capacity: "定員60名",
+        bonus: "なし",
+        workHours: "08:00〜18:00の間で1日4時間から応相談",
+        holidays: "シフトによる（土日祝休み可能）",
+        welfare: "労災保険、交通費支給、エプロン貸与",
+        points: "・シフトの融通が利きやすい職場です。\n・ブランクがある方も大歓迎です。"
+      }
+    }
+  ];
+
+  // 表示する求人をフィルタリングする処理
+  const getDisplayJobs = () => {
+    let displayJobs = allJobs.filter(job => selectedOptions.employmentType.includes(job.targetType));
+    // 該当がない場合は正社員を表示
+    if (displayJobs.length === 0) {
+      displayJobs = allJobs.filter(job => job.targetType === '正社員（フルタイム）');
+    }
+    return displayJobs;
+  };
+
+  // --- 画面：アンケートフォーム ---
+  const renderForm = () => (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-fade-in">
+      <h2 className="text-xl font-bold text-gray-800 mb-2">30秒で完了！簡単なアンケート</h2>
+      <p className="text-sm text-gray-500 mb-6">現在の状況やお悩みをお聞かせください。あなたにぴったりの非公開求人をご案内します。</p>
+
+      <div className="space-y-6">
+        {/* 質問1 */}
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-3 flex items-center">
+            <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm mr-2">1</span>
+            現在のお仕事で悩んでいることは何ですか？（複数選択可）
+          </h3>
+          <div className="space-y-2">
+            {['残業や持ち帰り仕事が多い', '給与が低い・なかなか上がらない', '休みが少ない・有給が取りづらい', '人間関係・職場の雰囲気に疲れた'].map((option) => (
+              <label key={option} className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${selectedOptions.concerns.includes(option) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input type="checkbox" className="hidden" checked={selectedOptions.concerns.includes(option)} onChange={() => toggleOption('concerns', option)} />
+                <div className={`w-5 h-5 rounded border flex items-center justify-center mr-3 ${selectedOptions.concerns.includes(option) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
+                  {selectedOptions.concerns.includes(option) && <CheckCircle2 className="w-4 h-4 text-white" />}
+                </div>
+                <span className={selectedOptions.concerns.includes(option) ? 'text-blue-700 font-medium' : 'text-gray-600 text-sm'}>{option}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* 質問2 */}
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-3 flex items-center">
+            <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm mr-2">2</span>
+            次に働くなら、どの雇用形態を希望しますか？（複数選択可）
+          </h3>
+          <div className="space-y-2">
+            {['正社員（フルタイム）', '契約社員', 'パート・アルバイト', '派遣社員'].map((option) => (
+              <label key={option} className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${selectedOptions.employmentType.includes(option) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input type="checkbox" className="hidden" checked={selectedOptions.employmentType.includes(option)} onChange={() => toggleOption('employmentType', option)} />
+                <div className={`w-5 h-5 rounded border flex items-center justify-center mr-3 ${selectedOptions.employmentType.includes(option) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
+                  {selectedOptions.employmentType.includes(option) && <CheckCircle2 className="w-4 h-4 text-white" />}
+                </div>
+                <span className={selectedOptions.employmentType.includes(option) ? 'text-blue-700 font-medium' : 'text-gray-600 text-sm'}>{option}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* 質問3 */}
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-3 flex items-center">
+            <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm mr-2">3</span>
+            どのような環境や働き方に惹かれますか？（複数選択可）
+          </h3>
+          <div className="space-y-2">
+            {['のびのび保育（自由遊び中心）', '行事や書類仕事が少なめ', '小規模で一人ひとりと向き合える', '手厚い福利厚生や家賃補助がある'].map((option) => (
+              <label key={option} className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${selectedOptions.philosophy.includes(option) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input type="checkbox" className="hidden" checked={selectedOptions.philosophy.includes(option)} onChange={() => toggleOption('philosophy', option)} />
+                <div className={`w-5 h-5 rounded border flex items-center justify-center mr-3 ${selectedOptions.philosophy.includes(option) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
+                  {selectedOptions.philosophy.includes(option) && <CheckCircle2 className="w-4 h-4 text-white" />}
+                </div>
+                <span className={selectedOptions.philosophy.includes(option) ? 'text-blue-700 font-medium' : 'text-gray-600 text-sm'}>{option}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        className="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-colors shadow-md"
+      >
+        回答を送信して求人を見る
+        <ArrowRight className="w-5 h-5 ml-2" />
+      </button>
+    </div>
+  );
+
+  // --- 画面：ローディング（5秒間） ---
+  const renderLoading = () => (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
+      <div className="relative w-24 h-24 mb-6">
+        <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
+        <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Search className="w-8 h-8 text-blue-600 animate-pulse" />
+        </div>
+      </div>
+      <h2 className="text-xl font-bold text-gray-800 mb-2">あなたの希望条件とマッチング中...</h2>
+      <p className="text-gray-500 text-sm mb-8 text-center">
+        最新の求人データベースから、あなたに最適な働き方を抽出しています。
+      </p>
+      
+      {/* プログレスバー */}
+      <div className="w-full max-w-xs bg-gray-200 rounded-full h-2 mb-2">
+        <div 
+          className="bg-blue-600 h-2 rounded-full transition-all duration-75 ease-linear"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+      <p className="text-xs text-gray-400 font-mono">{Math.round(progress)}%</p>
+    </div>
+  );
+
+  // --- 画面：結果一覧 ---
+  const renderResult = () => {
+    const displayJobs = getDisplayJobs();
+
+    return (
+      <div className="animate-fade-in-up">
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6 text-center shadow-sm">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-green-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
+            あなたの希望条件にぴったりの求人が見つかりました！
+          </h2>
+          <p className="text-green-700 text-sm text-left mt-4">
+            回答いただいたお悩みや希望条件を考慮し、現在急募中の非公開求人をピックアップしました。（※施設名等の詳細な情報は、エージェントにお問い合わせいただいた際にお伝えします）
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {displayJobs.map((job) => (
+            <div key={job.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
+                <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded mb-2 inline-block">
+                  {job.badge}
+                </span>
+                <h3 className="text-white font-bold text-base leading-snug">
+                  {job.title}
+                </h3>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {job.tags.map(tag => (
+                    <span key={tag} className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded border border-blue-200">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-start">
+                    <Heart className="w-5 h-5 text-pink-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">おすすめポイント</p>
+                      <p className="text-sm text-gray-600 mt-1">{job.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <Building className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">{job.targetType.includes('パート') ? '想定時給' : '想定給与'}</p>
+                      <p className="text-sm text-gray-600 mt-1">{job.salary}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <MapPin className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">勤務地</p>
+                      <p className="text-sm text-gray-600 mt-1">{job.location}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setStep('detail');
+                    window.scrollTo(0, 0);
+                  }}
+                  className="w-full bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold py-3 px-6 rounded-xl flex items-center justify-center transition-colors border border-blue-200 group text-sm"
+                >
+                  この求人の詳細を見てみる
+                  <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* LINE相談ボタンエリア（一覧画面下部） */}
+        <div className="mt-8 bg-gray-50 rounded-2xl p-6 border border-gray-200 text-center shadow-sm">
+          <h3 className="font-bold text-gray-800 mb-2">気になる求人はありましたか？</h3>
+          <p className="text-sm text-gray-500 mb-4">まずは話を聞いてみたい、という方も大歓迎です。LINEでお気軽にエージェントにご相談ください。</p>
+          <button 
+            onClick={() => window.open('https://works.do/R/ti/p/ho.73521@hoikushicarrier', '_blank')}
+            className="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 px-6 rounded-xl transition-colors shadow-md flex items-center justify-center text-lg"
+          >
+            {/* LINE風アイコン */}
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 mr-2">
+              <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.122.303.04 .722.019.922-.036.319-.24 1.488-.291 1.766-.08.441-.336 1.66 1.455.908 1.791-.752 9.68-5.717 11.233-9.52 1.01-2.483.491-4.276.491-4.276z"/>
+            </svg>
+            エージェントにLINEで相談する
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // --- 画面：求人詳細 ---
+  const renderDetail = () => {
+    if (!selectedJob) return null;
+
+    return (
+      <div className="animate-fade-in">
+        {/* 戻るボタン */}
+        <button 
+          onClick={() => setStep('result')}
+          className="flex items-center text-gray-500 hover:text-blue-600 mb-4 transition-colors text-sm font-medium"
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          検索結果一覧に戻る
+        </button>
+
+        <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-5">
+            <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded mb-3 inline-block">
+              求人詳細
+            </span>
+            <h2 className="text-white font-bold text-lg leading-snug">
+              {selectedJob.title}
+            </h2>
+          </div>
+
+          <div className="p-6">
+            <h3 className="text-lg font-bold text-gray-800 border-b-2 border-blue-100 pb-2 mb-4 flex items-center">
+              <Heart className="w-5 h-5 text-pink-500 mr-2" />
+              この求人のおすすめポイント
+            </h3>
+            <div className="bg-pink-50 rounded-xl p-4 mb-8 text-gray-700 text-sm whitespace-pre-line leading-relaxed border border-pink-100">
+              {selectedJob.details.points}
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-800 border-b-2 border-gray-100 pb-2 mb-4 flex items-center">
+              <Building className="w-5 h-5 text-gray-500 mr-2" />
+              募集要項
+            </h3>
+            
+            {/* 詳細テーブル */}
+            <div className="space-y-0 text-sm border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">勤務地</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">{selectedJob.location}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">アクセス</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">{selectedJob.details.access}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">雇用形態</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">{selectedJob.targetType}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">施設形態・定員</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">認可保育園 / {selectedJob.details.capacity}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">給与</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">{selectedJob.salary}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">賞与・昇給</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">{selectedJob.details.bonus} / 昇給あり</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">勤務時間</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600">{selectedJob.details.workHours}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">休日・休暇</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600 whitespace-pre-line">{selectedJob.details.holidays}</div>
+              </div>
+              <div className="flex flex-col sm:flex-row border-b border-gray-200">
+                <div className="bg-gray-50 w-full sm:w-1/3 p-3 font-semibold text-gray-700">福利厚生</div>
+                <div className="w-full sm:w-2/3 p-3 text-gray-600 whitespace-pre-line">{selectedJob.details.welfare}</div>
+              </div>
+            </div>
+
+            <div className="mt-6 text-xs text-gray-400 bg-gray-50 p-3 rounded">
+              ※施設名や法人名などの詳細情報に関しましては、個人情報保護の観点からWeb上では非公開とさせていただいております。LINEにてエージェントにお問い合わせいただければ、詳細をお伝えいたします。
+            </div>
+          </div>
+        </div>
+
+        {/* LINE相談ボタンエリア */}
+        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 text-center shadow-sm">
+          <h3 className="font-bold text-gray-800 mb-2">この求人について詳しく知りたいですか？</h3>
+          <p className="text-sm text-gray-500 mb-4">施設名やさらに詳しい条件など、LINEでお気軽にエージェントにご質問ください。「まずは話を聞いてみたい」という方も大歓迎です。</p>
+          <button 
+            onClick={() => window.open('https://works.do/R/ti/p/ho.73521@hoikushicarrier', '_blank')}
+            className="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 px-6 rounded-xl transition-colors shadow-md flex items-center justify-center text-lg"
+          >
+            {/* LINE風アイコン */}
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 mr-2">
+              <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.122.303.04 .722.019.922-.036.319-.24 1.488-.291 1.766-.08.441-.336 1.66 1.455.908 1.791-.752 9.68-5.717 11.233-9.52 1.01-2.483.491-4.276.491-4.276z"/>
+            </svg>
+            エージェントにLINEで相談する
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans text-gray-800">
+      <div className="max-w-md mx-auto">
+        {/* ヘッダー */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-extrabold text-blue-900 tracking-tight">CAREER MATCH for 保育士</h1>
+          <p className="text-xs text-gray-500 mt-1">あなたの経験が活きる、新しい働き方</p>
+        </div>
+
+        {/* コンテンツエリア */}
+        <div className="transition-all duration-300">
+          {step === 'form' && renderForm()}
+          {step === 'loading' && renderLoading()}
+          {step === 'result' && renderResult()}
+          {step === 'detail' && renderDetail()}
+        </div>
+        
+        {/* フッター */}
+        <div className="text-center mt-8 text-xs text-gray-400">
+          &copy; 2026 Career Match Agent Inc.
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-in-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+        .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+      `}} />
+    </div>
+  );
+}
