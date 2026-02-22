@@ -1,20 +1,19 @@
-import React, { useState, useRef } from 'react';
-import { 
-  Printer, 
-  Image as ImageIcon, 
-  MapPin, 
-  Banknote, 
-  Gift, 
-  Calendar, 
-  CheckCircle2, 
-  Building2,
-  Info,
-  MessageCircle
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>保育士向け非公開求人メーカー</title>
+  
+  <!-- Tailwind CSS の読み込み -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React, ReactDOM, Babel の読み込み（ブラウザでReactを動かすため） -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-// 印刷用のCSS
-const PrintStyle = () => (
-  <style>{`
+  <style>
     @media print {
       body { background-color: white !important; }
       .no-print { display: none !important; }
@@ -32,497 +31,507 @@ const PrintStyle = () => (
       }
       @page { margin: 15mm 10mm; }
     }
-  `}</style>
-);
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-const initialJobs = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&q=80&w=800", // デフォルトのダミー画像
-    imageScale: 1,
-    imagePosX: 50,
-    imagePosY: 50,
-    address: "東京都目黒区",
-    baseSalary: 288300,
-    bonus: "前年実績 2.15ヶ月分",
-    holidays: 129,
-    point1: "経験に応じた給与体系で月給28.8万円〜の高待遇！残業代も別途支給され、頑張りがしっかり評価されます。",
-    point2: "年間休日129日とお休みが充実！リフレッシュ休暇や誕生日休暇もあり、プライベートの時間を大切にできます。",
-    point3: "敷金・礼金等の初期費用から家賃まで、上限なしの全額法人負担となる手厚い借り上げ社宅制度があります。",
-    point4: "給食費補助や退職金制度など福利厚生が充実。Web面接1回のスピーディーな選考も魅力の求人です。"
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1503454537195-1dc534baf3f4?auto=format&fit=crop&q=80&w=800",
-    imageScale: 1,
-    imagePosX: 50,
-    imagePosY: 50,
-    address: "東京都目黒区",
-    baseSalary: 285700,
-    bonus: "前年実績 558,500円〜（賞与・一時金）",
-    holidays: 125,
-    point1: "年間休日125日＆残業月平均7時間！しっかり休めて持ち帰り仕事もないため、無理なく長く働ける環境です。",
-    point2: "引越し初期費用補助（上限20万円）や上限9.5万円の借り上げ社宅制度があり、新生活を全力でサポート！",
-    point3: "充実した各種研修制度や海外研修、キャリアパスサポートがあり、保育士としてのスキルアップを目指せます。",
-    point4: "メンタルヘルスカウンセリングやクラブ活動など、職員の心身の健康とコミュニケーションを大切にしています。"
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1536337005238-94b997371b40?auto=format&fit=crop&q=80&w=800",
-    imageScale: 1,
-    imagePosX: 50,
-    imagePosY: 50,
-    address: "東京都目黒区",
-    baseSalary: 244456,
-    bonus: "前年実績 3.5ヶ月分＋年度末一時金",
-    holidays: 120,
-    point1: "賞与は前年実績3.5ヶ月分に加え、年度末一時金（20万円〜）も支給！日々の努力が収入に還元されます。",
-    point2: "定着率90%以上！職員同士の仲が良く、働きやすい環境づくりに力を入れているため長く安心して働けます。",
-    point3: "有給休暇や年6日のリフレッシュ休暇があり、オンオフのメリハリをつけてしっかり休める年間休日120日です。",
-    point4: "「考えさせるを、考える」を保育方針とし、子どもたちの主体性や自律心を育む、あたたかい保育を実践しています。"
-  }
-];
+  <script type="text/babel">
+    const { useState, useRef } = React;
 
-export default function App() {
-  const [jobs, setJobs] = useState(initialJobs);
-  const [activeTab, setActiveTab] = useState(0);
-  const [showPrintWarning, setShowPrintWarning] = useState(false);
+    // --- アイコンコンポーネントの定義 ---
+    const Printer = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>;
+    const ImageIcon = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>;
+    const MapPin = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
+    const Banknote = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>;
+    const Gift = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>;
+    const Calendar = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>;
+    const CheckCircle2 = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>;
+    const Building2 = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>;
+    const Info = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>;
+    const MessageCircle = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"></path></svg>;
 
-  // 求人データの更新処理
-  const handleChange = (index, field, value) => {
-    const newJobs = [...jobs];
-    newJobs[index] = { ...newJobs[index], [field]: value };
-    setJobs(newJobs);
-  };
+    const initialJobs = [
+      {
+        id: 1,
+        image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&q=80&w=800",
+        imageScale: 1,
+        imagePosX: 50,
+        imagePosY: 50,
+        address: "東京都目黒区",
+        baseSalary: 288300,
+        bonus: "前年実績 2.15ヶ月分",
+        holidays: 129,
+        point1: "経験に応じた給与体系で月給28.8万円〜の高待遇！残業代も別途支給され、頑張りがしっかり評価されます。",
+        point2: "年間休日129日とお休みが充実！リフレッシュ休暇や誕生日休暇もあり、プライベートの時間を大切にできます。",
+        point3: "敷金・礼金等の初期費用から家賃まで、上限なしの全額法人負担となる手厚い借り上げ社宅制度があります。",
+        point4: "給食費補助や退職金制度など福利厚生が充実。Web面接1回のスピーディーな選考も魅力の求人です。"
+      },
+      {
+        id: 2,
+        image: "https://images.unsplash.com/photo-1503454537195-1dc534baf3f4?auto=format&fit=crop&q=80&w=800",
+        imageScale: 1,
+        imagePosX: 50,
+        imagePosY: 50,
+        address: "東京都目黒区",
+        baseSalary: 285700,
+        bonus: "前年実績 558,500円〜（賞与・一時金）",
+        holidays: 125,
+        point1: "年間休日125日＆残業月平均7時間！しっかり休めて持ち帰り仕事もないため、無理なく長く働ける環境です。",
+        point2: "引越し初期費用補助（上限20万円）や上限9.5万円の借り上げ社宅制度があり、新生活を全力でサポート！",
+        point3: "充実した各種研修制度や海外研修、キャリアパスサポートがあり、保育士としてのスキルアップを目指せます。",
+        point4: "メンタルヘルスカウンセリングやクラブ活動など、職員の心身の健康とコミュニケーションを大切にしています。"
+      },
+      {
+        id: 3,
+        image: "https://images.unsplash.com/photo-1536337005238-94b997371b40?auto=format&fit=crop&q=80&w=800",
+        imageScale: 1,
+        imagePosX: 50,
+        imagePosY: 50,
+        address: "東京都目黒区",
+        baseSalary: 244456,
+        bonus: "前年実績 3.5ヶ月分＋年度末一時金",
+        holidays: 120,
+        point1: "賞与は前年実績3.5ヶ月分に加え、年度末一時金（20万円〜）も支給！日々の努力が収入に還元されます。",
+        point2: "定着率90%以上！職員同士の仲が良く、働きやすい環境づくりに力を入れているため長く安心して働けます。",
+        point3: "有給休暇や年6日のリフレッシュ休暇があり、オンオフのメリハリをつけてしっかり休める年間休日120日です。",
+        point4: "「考えさせるを、考える」を保育方針とし、子どもたちの主体性や自律心を育む、あたたかい保育を実践しています。"
+      }
+    ];
 
-  // 画像アップロード処理
-  const handleImageUpload = (index, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      handleChange(index, 'image', imageUrl);
-    }
-  };
+    function App() {
+      const [jobs, setJobs] = useState(initialJobs);
+      const [activeTab, setActiveTab] = useState(0);
+      const [showPrintWarning, setShowPrintWarning] = useState(false);
 
-  // PDF印刷処理
-  const handlePrint = () => {
-    const printContent = document.getElementById('print-area').innerHTML;
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>非公開求人</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-              @media print {
-                body { 
-                  -webkit-print-color-adjust: exact; 
-                  print-color-adjust: exact; 
-                  background-color: white !important;
-                }
-                .no-print { display: none !important; }
-                .job-card { 
-                  page-break-inside: avoid; 
-                  border: 2px solid #fecdd3 !important; /* rose-200 */
-                  margin-bottom: 32px !important;
-                  border-radius: 1rem !important;
-                  overflow: hidden !important;
-                  box-shadow: none !important;
-                }
-              }
-              body { font-family: sans-serif; }
-            </style>
-          </head>
-          <body>
-            <div class="p-4 md:p-8">
-              ${printContent}
-            </div>
-            <script>
-              // Tailwindのスタイルが適用されるのを待ってから印刷ダイアログを開く
-              setTimeout(() => {
-                window.print();
-              }, 1000);
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    } else {
-      setShowPrintWarning(true);
-      setTimeout(() => setShowPrintWarning(false), 5000);
-    }
-  };
+      const handleChange = (index, field, value) => {
+        const newJobs = [...jobs];
+        newJobs[index] = { ...newJobs[index], [field]: value };
+        setJobs(newJobs);
+      };
 
-  return (
-    <div className="min-h-screen bg-rose-50 font-sans text-slate-800 flex flex-col md:flex-row">
-      <PrintStyle />
+      const handleImageUpload = (index, e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const imageUrl = URL.createObjectURL(file);
+          handleChange(index, 'image', imageUrl);
+        }
+      };
 
-      {/* 左側：編集パネル（印刷時は非表示） */}
-      <div className="w-full md:w-1/3 bg-white border-r border-rose-200 p-6 flex flex-col h-screen md:sticky top-0 overflow-y-auto no-print shadow-lg z-10">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-rose-700 flex items-center gap-2">
-            <Building2 className="text-rose-500" />
-            求人票メーカー
-          </h1>
-        </div>
-
-        <button 
-          onClick={handlePrint}
-          className="w-full mb-2 bg-rose-500 hover:bg-rose-600 text-white text-lg font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-        >
-          <Printer size={24} />
-          PDFとして保存する
-        </button>
-        
-        {showPrintWarning && (
-          <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-bold border border-red-200">
-            ポップアップがブロックされました。ブラウザのURLバー右側からポップアップを許可してください。
-          </div>
-        )}
-        {!showPrintWarning && <div className="mb-8"></div>}
-
-        {/* タブ切り替え */}
-        <div className="flex bg-rose-100 p-1 rounded-lg mb-6">
-          {jobs.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveTab(index)}
-              className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
-                activeTab === index 
-                  ? 'bg-white text-rose-700 shadow-sm' 
-                  : 'text-rose-600 hover:bg-rose-200'
-              }`}
-            >
-              求人 {index + 1}
-            </button>
-          ))}
-        </div>
-
-        {/* 入力フォーム */}
-        <div className="space-y-5 flex-1">
-          <h2 className="text-xl font-bold text-slate-700 mb-4 border-b-2 border-rose-100 pb-2">
-            求人 {activeTab + 1} の編集
-          </h2>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">園の画像</label>
-            <div className="flex flex-col gap-3">
-              <label htmlFor={`file-input-${activeTab}`} className="cursor-pointer bg-rose-50 border-2 border-dashed border-rose-300 hover:bg-rose-100 text-rose-700 px-4 py-3 rounded-lg flex-1 flex items-center justify-center gap-2 transition-colors">
-                <ImageIcon size={20} />
-                <span className="font-bold">画像を選択</span>
-              </label>
-              <input 
-                key={`file-input-${activeTab}`}
-                id={`file-input-${activeTab}`}
-                type="file" 
-                accept="image/*" 
-                className="hidden" 
-                onChange={(e) => {
-                  handleImageUpload(activeTab, e);
-                  e.target.value = ''; // 同じ画像でも連続で選択できるように状態をリセット
-                }} 
-              />
-
-              {/* 画像調整スライダー群 */}
-              <div className="bg-rose-50 p-3 rounded-lg border border-rose-100 space-y-3">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-sm font-bold text-slate-700">拡大・縮小</label>
-                    <span className="text-xs text-rose-700 font-bold">x {jobs[activeTab].imageScale || 1}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.5"
-                    max="3"
-                    step="0.1"
-                    value={jobs[activeTab].imageScale || 1}
-                    onChange={(e) => handleChange(activeTab, 'imageScale', parseFloat(e.target.value))}
-                    className="w-full accent-rose-400"
-                  />
+      const handlePrint = () => {
+        const printContent = document.getElementById('print-area').innerHTML;
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>非公開求人</title>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <style>
+                  @media print {
+                    body { 
+                      -webkit-print-color-adjust: exact; 
+                      print-color-adjust: exact; 
+                      background-color: white !important;
+                    }
+                    .no-print { display: none !important; }
+                    .job-card { 
+                      page-break-inside: avoid; 
+                      border: 2px solid #fecdd3 !important; /* rose-200 */
+                      margin-bottom: 32px !important;
+                      border-radius: 1rem !important;
+                      overflow: hidden !important;
+                      box-shadow: none !important;
+                    }
+                  }
+                  body { font-family: sans-serif; }
+                </style>
+              </head>
+              <body>
+                <div class="p-4 md:p-8">
+                  ${printContent}
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-bold text-slate-600 mb-1 block">横の位置調整</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={jobs[activeTab].imagePosX ?? 50}
-                      onChange={(e) => handleChange(activeTab, 'imagePosX', parseInt(e.target.value))}
-                      className="w-full accent-rose-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-600 mb-1 block">縦の位置調整</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={jobs[activeTab].imagePosY ?? 50}
-                      onChange={(e) => handleChange(activeTab, 'imagePosY', parseInt(e.target.value))}
-                      className="w-full accent-rose-400"
-                    />
+                <script>
+                  setTimeout(() => {
+                    window.print();
+                  }, 1000);
+                <\/script>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+        } else {
+          setShowPrintWarning(true);
+          setTimeout(() => setShowPrintWarning(false), 5000);
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-rose-50 font-sans text-slate-800 flex flex-col md:flex-row">
+          {/* 左側：編集パネル（印刷時は非表示） */}
+          <div className="w-full md:w-1/3 bg-white border-r border-rose-200 p-6 flex flex-col h-screen md:sticky top-0 overflow-y-auto no-print shadow-lg z-10">
+            <div className="mb-6 flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-rose-700 flex items-center gap-2">
+                <Building2 className="text-rose-500" />
+                求人票メーカー
+              </h1>
+            </div>
+
+            <button 
+              onClick={handlePrint}
+              className="w-full mb-2 bg-rose-500 hover:bg-rose-600 text-white text-lg font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+            >
+              <Printer size={24} />
+              PDFとして保存する
+            </button>
+            
+            {showPrintWarning && (
+              <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-bold border border-red-200">
+                ポップアップがブロックされました。ブラウザのURLバー右側からポップアップを許可してください。
+              </div>
+            )}
+            {!showPrintWarning && <div className="mb-8"></div>}
+
+            {/* タブ切り替え */}
+            <div className="flex bg-rose-100 p-1 rounded-lg mb-6">
+              {jobs.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveTab(index)}
+                  className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
+                    activeTab === index 
+                      ? 'bg-white text-rose-700 shadow-sm' 
+                      : 'text-rose-600 hover:bg-rose-200'
+                  }`}
+                >
+                  求人 {index + 1}
+                </button>
+              ))}
+            </div>
+
+            {/* 入力フォーム */}
+            <div className="space-y-5 flex-1">
+              <h2 className="text-xl font-bold text-slate-700 mb-4 border-b-2 border-rose-100 pb-2">
+                求人 {activeTab + 1} の編集
+              </h2>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">園の画像</label>
+                <div className="flex flex-col gap-3">
+                  <label htmlFor={`file-input-${activeTab}`} className="cursor-pointer bg-rose-50 border-2 border-dashed border-rose-300 hover:bg-rose-100 text-rose-700 px-4 py-3 rounded-lg flex-1 flex items-center justify-center gap-2 transition-colors">
+                    <ImageIcon size={20} />
+                    <span className="font-bold">画像を選択</span>
+                  </label>
+                  <input 
+                    key={`file-input-${activeTab}`}
+                    id={`file-input-${activeTab}`}
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      handleImageUpload(activeTab, e);
+                      e.target.value = ''; 
+                    }} 
+                  />
+
+                  {/* 画像調整スライダー群 */}
+                  <div className="bg-rose-50 p-3 rounded-lg border border-rose-100 space-y-3">
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-sm font-bold text-slate-700">拡大・縮小</label>
+                        <span className="text-xs text-rose-700 font-bold">x {jobs[activeTab].imageScale || 1}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="3"
+                        step="0.1"
+                        value={jobs[activeTab].imageScale || 1}
+                        onChange={(e) => handleChange(activeTab, 'imageScale', parseFloat(e.target.value))}
+                        className="w-full accent-rose-400"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 mb-1 block">横の位置調整</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={jobs[activeTab].imagePosX ?? 50}
+                          onChange={(e) => handleChange(activeTab, 'imagePosX', parseInt(e.target.value))}
+                          className="w-full accent-rose-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 mb-1 block">縦の位置調整</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={jobs[activeTab].imagePosY ?? 50}
+                          onChange={(e) => handleChange(activeTab, 'imagePosY', parseInt(e.target.value))}
+                          className="w-full accent-rose-400"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">住所（市区町村まで）</label>
-            <input
-              type="text"
-              value={jobs[activeTab].address}
-              onChange={(e) => handleChange(activeTab, 'address', e.target.value)}
-              className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
-              placeholder="例：東京都渋谷区"
-            />
-          </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">住所（市区町村まで）</label>
+                <input
+                  type="text"
+                  value={jobs[activeTab].address}
+                  onChange={(e) => handleChange(activeTab, 'address', e.target.value)}
+                  className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
+                  placeholder="例：東京都渋谷区"
+                />
+              </div>
 
-          <div className="bg-rose-50 p-4 rounded-xl border border-rose-100">
-            <label className="block text-sm font-bold text-slate-700 mb-1">基本月給（円）</label>
-            <div className="flex items-center gap-2 text-sm text-rose-700 mb-2">
-              <Info size={16} />
-              <span>プレビューには <b>+2万円</b> された額が表示されます</span>
-            </div>
-            <input
-              type="number"
-              value={jobs[activeTab].baseSalary}
-              onChange={(e) => handleChange(activeTab, 'baseSalary', e.target.value)}
-              className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
-              placeholder="例：210000"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">賞与（前年実績）</label>
-            <input
-              type="text"
-              value={jobs[activeTab].bonus}
-              onChange={(e) => handleChange(activeTab, 'bonus', e.target.value)}
-              className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
-              placeholder="例：前年実績 3.0ヶ月分"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">年間休日（日数）</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={jobs[activeTab].holidays}
-                onChange={(e) => handleChange(activeTab, 'holidays', e.target.value)}
-                className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
-                placeholder="例：120"
-              />
-              <span className="text-lg font-bold text-slate-600">日</span>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <label className="block text-sm font-bold text-slate-700 mb-2">おすすめポイント（各60文字程度）</label>
-            <div className="space-y-3">
-              <textarea
-                value={jobs[activeTab].point1}
-                maxLength={60}
-                rows={2}
-                onChange={(e) => handleChange(activeTab, 'point1', e.target.value)}
-                className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
-                placeholder="ポイント1"
-              />
-              <textarea
-                value={jobs[activeTab].point2}
-                maxLength={60}
-                rows={2}
-                onChange={(e) => handleChange(activeTab, 'point2', e.target.value)}
-                className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
-                placeholder="ポイント2"
-              />
-              <textarea
-                value={jobs[activeTab].point3}
-                maxLength={60}
-                rows={2}
-                onChange={(e) => handleChange(activeTab, 'point3', e.target.value)}
-                className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
-                placeholder="ポイント3"
-              />
-              <textarea
-                value={jobs[activeTab].point4}
-                maxLength={60}
-                rows={2}
-                onChange={(e) => handleChange(activeTab, 'point4', e.target.value)}
-                className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
-                placeholder="ポイント4"
-              />
-            </div>
-          </div>
-          <div className="h-20"></div> {/* スクロール余白 */}
-        </div>
-      </div>
-
-      {/* 右側：プレビューパネル */}
-      <div id="print-area" className="w-full md:w-2/3 p-4 md:p-8 print-area overflow-y-auto">
-        <div className="max-w-2xl mx-auto">
-          
-          <div className="text-center mb-8 no-print">
-            <h2 className="text-xl md:text-3xl font-black text-rose-700 mb-2">おすすめ非公開求人</h2>
-            <p className="text-rose-500 font-bold">あなたにピッタリの求人をピックアップしました！</p>
-          </div>
-
-          <div className="space-y-8">
-            {jobs.map((job, index) => {
-              // 月給に2万円をプラスする計算
-              const displaySalary = (Number(job.baseSalary) || 0) + 20000;
-
-              return (
-                <div key={job.id} className="job-card bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-rose-100">
-                  
-                  {/* 画像セクション */}
-                  {/* 高さを h-64 から h-96 に大幅アップして写真エリアを拡大 */}
-                  <div className="relative h-64 md:h-96 bg-slate-100 overflow-hidden">
-                    {job.image ? (
-                      <img 
-                        src={job.image} 
-                        alt={`求人${index + 1}のイメージ`} 
-                        className="w-full h-full object-cover transition-all duration-200"
-                        style={{ 
-                          transform: `scale(${job.imageScale || 1})`,
-                          objectPosition: `${job.imagePosX ?? 50}% ${job.imagePosY ?? 50}%`
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-400 flex-col gap-2">
-                        <ImageIcon size={48} />
-                        <span className="font-bold">No Image</span>
-                      </div>
-                    )}
-                    {/* 園名非公開ラベル */}
-                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur px-4 py-2 rounded-lg shadow-md border-l-4 border-rose-400">
-                      <span className="text-lg font-black text-slate-800 tracking-wider">
-                        園名：非公開
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* コンテンツセクション */}
-                  {/* 全体的な内側の余白を拡張 */}
-                  <div className="p-6 md:p-10">
-                    
-                    {/* 基本情報 */}
-                    {/* grid-cols-2 に固定することで常に2列配置にする。余白(gap, p, mb)を大きく拡張 */}
-                    <div className="grid grid-cols-2 gap-y-8 gap-x-6 bg-rose-50/50 p-6 md:p-8 rounded-2xl border border-rose-100 mb-12">
-                      
-                      <div className="flex items-start gap-4">
-                        <MapPin className="text-rose-400 shrink-0 mt-1" size={28} />
-                        <div className="min-w-0">
-                          <div className="text-base font-bold text-rose-600 mb-1.5">勤務地</div>
-                          <div className="text-xl md:text-2xl font-bold text-slate-800 break-words">{job.address || 'ー'}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-4">
-                        <Banknote className="text-rose-400 shrink-0 mt-1" size={28} />
-                        <div className="min-w-0">
-                          <div className="text-base font-bold text-rose-600 mb-1.5">月給</div>
-                          <div className="text-xl md:text-2xl font-black text-rose-600 break-words">
-                            {displaySalary.toLocaleString()} 円〜
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-4">
-                        <Gift className="text-rose-400 shrink-0 mt-1" size={28} />
-                        <div className="min-w-0">
-                          <div className="text-base font-bold text-rose-600 mb-1.5">賞与</div>
-                          <div className="text-lg md:text-xl font-bold text-slate-800 break-words">{job.bonus || 'ー'}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-4">
-                        <Calendar className="text-rose-400 shrink-0 mt-1" size={28} />
-                        <div className="min-w-0">
-                          <div className="text-base font-bold text-rose-600 mb-1.5">年間休日</div>
-                          <div className="text-lg md:text-xl font-bold text-slate-800 break-words">
-                            {job.holidays ? `${job.holidays} 日` : 'ー'}
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* おすすめポイント */}
-                    <div>
-                      {/* 見出しを少し大きくし、下部の余白を拡張 */}
-                      <h3 className="text-xl md:text-2xl font-black text-rose-600 mb-6 flex items-center gap-3 border-b-2 border-rose-100 pb-3">
-                        <span className="bg-rose-100 p-2 rounded-lg"><CheckCircle2 size={28} /></span>
-                        おすすめポイント
-                      </h3>
-                      {/* リストの間隔(space-y)を拡張 */}
-                      <ul className="space-y-6">
-                        {job.point1 && (
-                          <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
-                            <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
-                            <span>{job.point1}</span>
-                          </li>
-                        )}
-                        {job.point2 && (
-                          <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
-                            <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
-                            <span>{job.point2}</span>
-                          </li>
-                        )}
-                        {job.point3 && (
-                          <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
-                            <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
-                            <span>{job.point3}</span>
-                          </li>
-                        )}
-                        {job.point4 && (
-                          <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
-                            <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
-                            <span>{job.point4}</span>
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-
-                  </div>
+              <div className="bg-rose-50 p-4 rounded-xl border border-rose-100">
+                <label className="block text-sm font-bold text-slate-700 mb-1">基本月給（円）</label>
+                <div className="flex items-center gap-2 text-sm text-rose-700 mb-2">
+                  <Info size={16} />
+                  <span>プレビューには <b>+2万円</b> された額が表示されます</span>
                 </div>
-              );
-            })}
+                <input
+                  type="number"
+                  value={jobs[activeTab].baseSalary}
+                  onChange={(e) => handleChange(activeTab, 'baseSalary', e.target.value)}
+                  className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
+                  placeholder="例：210000"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">賞与（前年実績）</label>
+                <input
+                  type="text"
+                  value={jobs[activeTab].bonus}
+                  onChange={(e) => handleChange(activeTab, 'bonus', e.target.value)}
+                  className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
+                  placeholder="例：前年実績 3.0ヶ月分"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">年間休日（日数）</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={jobs[activeTab].holidays}
+                    onChange={(e) => handleChange(activeTab, 'holidays', e.target.value)}
+                    className="w-full border-2 border-slate-200 rounded-lg p-3 text-lg focus:border-rose-400 focus:outline-none transition-colors"
+                    placeholder="例：120"
+                  />
+                  <span className="text-lg font-bold text-slate-600">日</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <label className="block text-sm font-bold text-slate-700 mb-2">おすすめポイント（各60文字程度）</label>
+                <div className="space-y-3">
+                  <textarea
+                    value={jobs[activeTab].point1}
+                    maxLength={60}
+                    rows={2}
+                    onChange={(e) => handleChange(activeTab, 'point1', e.target.value)}
+                    className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
+                    placeholder="ポイント1"
+                  />
+                  <textarea
+                    value={jobs[activeTab].point2}
+                    maxLength={60}
+                    rows={2}
+                    onChange={(e) => handleChange(activeTab, 'point2', e.target.value)}
+                    className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
+                    placeholder="ポイント2"
+                  />
+                  <textarea
+                    value={jobs[activeTab].point3}
+                    maxLength={60}
+                    rows={2}
+                    onChange={(e) => handleChange(activeTab, 'point3', e.target.value)}
+                    className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
+                    placeholder="ポイント3"
+                  />
+                  <textarea
+                    value={jobs[activeTab].point4}
+                    maxLength={60}
+                    rows={2}
+                    onChange={(e) => handleChange(activeTab, 'point4', e.target.value)}
+                    className="w-full border-2 border-slate-200 rounded-lg p-3 focus:border-rose-400 focus:outline-none transition-colors resize-none leading-relaxed"
+                    placeholder="ポイント4"
+                  />
+                </div>
+              </div>
+              <div className="h-20"></div> {/* スクロール余白 */}
+            </div>
           </div>
 
-          {/* LINEお友だち追加エリア */}
-          <div className="mt-12 bg-white rounded-2xl shadow-lg border-2 border-[#06C755]/30 p-8 md:p-10 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-[#06C755]"></div>
-            <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-4">
-              気になった求人はありましたか？
-            </h3>
-            <p className="text-base md:text-lg text-slate-600 font-bold mb-8 leading-relaxed">
-              今回の求人の詳細や、面接・見学のご相談につきましては、<br className="hidden md:block" />
-              専任のキャリアアドバイザー（CA）がLINEにて個別にご案内いたします。<br />
-              ぜひお気軽に友だち追加をしてメッセージをお送りください！
-            </p>
-            <a 
-              href="https://works.do/R/ti/p/ho.73521@hoikushicarrier" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-3 bg-[#06C755] hover:bg-[#05b34c] text-white text-lg md:text-xl font-bold py-4 px-8 md:px-12 rounded-full transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1"
-            >
-              <MessageCircle size={28} />
-              LINEで求人の詳細を聞く
-            </a>
-          </div>
+          {/* 右側：プレビューパネル */}
+          <div id="print-area" className="w-full md:w-2/3 p-4 md:p-8 print-area overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+              
+              <div className="text-center mb-8 no-print">
+                <h2 className="text-xl md:text-3xl font-black text-rose-700 mb-2">おすすめ非公開求人</h2>
+                <p className="text-rose-500 font-bold">あなたにピッタリの求人をピックアップしました！</p>
+              </div>
 
-          {/* 印刷用フッター（PDF化された時のみ表示される案内） */}
-          <div className="hidden print-only text-center mt-8 text-slate-500 font-bold">
-            ※ 園の詳細な情報については、担当コンサルタントまでお気軽にお問い合わせください。
+              <div className="space-y-8">
+                {jobs.map((job, index) => {
+                  const displaySalary = (Number(job.baseSalary) || 0) + 20000;
+
+                  return (
+                    <div key={job.id} className="job-card bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-rose-100">
+                      
+                      {/* 画像セクション */}
+                      <div className="relative h-64 md:h-96 bg-slate-100 overflow-hidden">
+                        {job.image ? (
+                          <img 
+                            src={job.image} 
+                            alt={`求人${index + 1}のイメージ`} 
+                            className="w-full h-full object-cover transition-all duration-200"
+                            style={{ 
+                              transform: `scale(${job.imageScale || 1})`,
+                              objectPosition: `${job.imagePosX ?? 50}% ${job.imagePosY ?? 50}%`
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 flex-col gap-2">
+                            <ImageIcon size={48} />
+                            <span className="font-bold">No Image</span>
+                          </div>
+                        )}
+                        <div className="absolute top-4 left-4 bg-white/95 backdrop-blur px-4 py-2 rounded-lg shadow-md border-l-4 border-rose-400">
+                          <span className="text-lg font-black text-slate-800 tracking-wider">
+                            園名：非公開
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* コンテンツセクション */}
+                      <div className="p-6 md:p-10">
+                        
+                        {/* 基本情報 */}
+                        <div className="grid grid-cols-2 gap-y-8 gap-x-6 bg-rose-50/50 p-6 md:p-8 rounded-2xl border border-rose-100 mb-12">
+                          
+                          <div className="flex items-start gap-4">
+                            <MapPin className="text-rose-400 shrink-0 mt-1" size={28} />
+                            <div className="min-w-0">
+                              <div className="text-base font-bold text-rose-600 mb-1.5">勤務地</div>
+                              <div className="text-xl md:text-2xl font-bold text-slate-800 break-words">{job.address || 'ー'}</div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-4">
+                            <Banknote className="text-rose-400 shrink-0 mt-1" size={28} />
+                            <div className="min-w-0">
+                              <div className="text-base font-bold text-rose-600 mb-1.5">月給</div>
+                              <div className="text-xl md:text-2xl font-black text-rose-600 break-words">
+                                {displaySalary.toLocaleString()} 円〜
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-4">
+                            <Gift className="text-rose-400 shrink-0 mt-1" size={28} />
+                            <div className="min-w-0">
+                              <div className="text-base font-bold text-rose-600 mb-1.5">賞与</div>
+                              <div className="text-lg md:text-xl font-bold text-slate-800 break-words">{job.bonus || 'ー'}</div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-4">
+                            <Calendar className="text-rose-400 shrink-0 mt-1" size={28} />
+                            <div className="min-w-0">
+                              <div className="text-base font-bold text-rose-600 mb-1.5">年間休日</div>
+                              <div className="text-lg md:text-xl font-bold text-slate-800 break-words">
+                                {job.holidays ? `${job.holidays} 日` : 'ー'}
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+
+                        {/* おすすめポイント */}
+                        <div>
+                          <h3 className="text-xl md:text-2xl font-black text-rose-600 mb-6 flex items-center gap-3 border-b-2 border-rose-100 pb-3">
+                            <span className="bg-rose-100 p-2 rounded-lg"><CheckCircle2 size={28} /></span>
+                            おすすめポイント
+                          </h3>
+                          <ul className="space-y-6">
+                            {job.point1 && (
+                              <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
+                                <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
+                                <span>{job.point1}</span>
+                              </li>
+                            )}
+                            {job.point2 && (
+                              <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
+                                <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
+                                <span>{job.point2}</span>
+                              </li>
+                            )}
+                            {job.point3 && (
+                              <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
+                                <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
+                                <span>{job.point3}</span>
+                              </li>
+                            )}
+                            {job.point4 && (
+                              <li className="flex items-start gap-3 text-lg md:text-xl font-bold text-slate-700 leading-relaxed break-words">
+                                <span className="text-rose-400 mt-1 shrink-0 text-xl">★</span>
+                                <span>{job.point4}</span>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* LINEお友だち追加エリア */}
+              <div className="mt-12 bg-white rounded-2xl shadow-lg border-2 border-[#06C755]/30 p-8 md:p-10 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-[#06C755]"></div>
+                <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-4">
+                  気になった求人はありましたか？
+                </h3>
+                <p className="text-base md:text-lg text-slate-600 font-bold mb-8 leading-relaxed">
+                  今回の求人の詳細や、面接・見学のご相談につきましては、<br className="hidden md:block" />
+                  専任のキャリアアドバイザー（CA）がLINEにて個別にご案内いたします。<br />
+                  ぜひお気軽に友だち追加をしてメッセージをお送りください！
+                </p>
+                <a 
+                  href="https://works.do/R/ti/p/ho.73521@hoikushicarrier" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-3 bg-[#06C755] hover:bg-[#05b34c] text-white text-lg md:text-xl font-bold py-4 px-8 md:px-12 rounded-full transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                >
+                  <MessageCircle size={28} />
+                  LINEで求人の詳細を聞く
+                </a>
+              </div>
+
+              {/* 印刷用フッター（PDF化された時のみ表示される案内） */}
+              <div className="hidden print-only text-center mt-8 text-slate-500 font-bold">
+                ※ 園の詳細な情報については、担当コンサルタントまでお気軽にお問い合わせください。
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
